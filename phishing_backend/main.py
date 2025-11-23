@@ -1,46 +1,45 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-import os
+from groq import Groq
 from dotenv import load_dotenv
-from openai import OpenAI
+import os
 
 load_dotenv()
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
 app = FastAPI()
 
-class InputText(BaseModel):
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+class Message(BaseModel):
     text: str
 
 @app.post("/detect_phishing")
-async def detect_phishing(data: InputText):
+async def detect_phishing(data: Message):
 
     prompt = f"""
     You are a phishing detection expert.
 
-    Analyze the following message and determine if it is phishing or safe.
-    Provide classification ONLY as:
-    - "PHISHING" 
-    - "SAFE"
+    Analyze the following message and determine if it is:
+    - PHISHING
+    - SAFE
 
     Then provide a short explanation.
 
-    Text:
+    Message:
     {data.text}
 
-    Respond in JSON format:
+    Respond ONLY in JSON:
     {{
-        "result": "...",
-        "explanation": "..."
+        "result": "",
+        "explanation": ""
     }}
     """
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",   
-        messages=[{"role": "user", "content": prompt}]
+        model="llama-3.1-8b-instant",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3
     )
 
-    llm_output = response.choices[0].message["content"]
+    return {"response": response.choices[0].message.content}
 
-    return {"response": llm_output}
