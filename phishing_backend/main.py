@@ -41,5 +41,9 @@ async def detect_phishing(data: Message):
         temperature=0.3
     )
 
+<<<<<<< HEAD
     return {"response": response.choices[0].message.content}
 
+=======
+    return {"response": response.choices[0].message.content}
+>>>>>>> 54563b6 (integrated both frontend and backend)
