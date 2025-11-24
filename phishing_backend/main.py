@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from groq import Groq
 from dotenv import load_dotenv
 import os
+import json
 
 load_dotenv()
 
@@ -21,6 +22,11 @@ app.add_middleware(
 
 class Message(BaseModel):
     text: str
+
+# Root route
+@app.get("/")
+def root():
+    return {"message": "Backend is running!"}
 
 @app.post("/detect_phishing")
 async def detect_phishing(data: Message):
@@ -50,4 +56,7 @@ async def detect_phishing(data: Message):
         temperature=0.3
     )
 
-    return {"response": response.choices[0].message.content}
+    try:
+        result_json = json.loads(response.choices[0].message.content)
+    except json.JSONDecodeError:
+        result_json = {"result": "ERROR", "explanation": response.choices[0].message.content}
