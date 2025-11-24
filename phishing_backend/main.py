@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from groq import Groq
 from dotenv import load_dotenv
@@ -9,6 +10,14 @@ load_dotenv()
 app = FastAPI()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins (mobile apps, Flutter, etc.)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class Message(BaseModel):
     text: str
@@ -41,9 +50,4 @@ async def detect_phishing(data: Message):
         temperature=0.3
     )
 
-<<<<<<< HEAD
     return {"response": response.choices[0].message.content}
-
-=======
-    return {"response": response.choices[0].message.content}
->>>>>>> 54563b6 (integrated both frontend and backend)
