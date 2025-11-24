@@ -56,9 +56,4 @@ async def detect_phishing(data: Message):
         temperature=0.3
     )
 
-    try:
-        result_json = json.loads(response.choices[0].message.content)
-    except json.JSONDecodeError:
-        result_json = {"result": "ERROR", "explanation": response.choices[0].message.content}
-
-    return result_json
+    return {"response": response.choices[0].message.content}
